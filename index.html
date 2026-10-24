@@ -155,7 +155,10 @@ function init(){
  readPrefs();renderPrefs();
  const fromHash=indexFromHash();if(fromHash>=0)state.topic=fromHash;
  renderTopic();renderDepth();renderParties();renderCountdown();
- if(fromHash>=0)work.scrollIntoView();
+ const nav=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+ if(fromHash>=0&&!(nav&&(nav.type==='reload'||nav.type==='back_forward')))work.scrollIntoView();
+ if(nav&&nav.type==='reload'){let y=null;try{y=sessionStorage.getItem('voto-en-claro-y')}catch(_){}if(y!==null){const go=()=>window.scrollTo({top:+y,behavior:'instant'});go();requestAnimationFrame(go);window.addEventListener('load',go,{once:true})}}
+ window.addEventListener('pagehide',()=>{try{sessionStorage.setItem('voto-en-claro-y',String(Math.round(scrollY)))}catch(_){}});
  $('topicList').addEventListener('click',e=>{const link=e.target.closest('.topic-choice');if(!link)return;e.preventDefault();chooseTopic(links.indexOf(link),true,true)});
  window.addEventListener('hashchange',()=>{const i=indexFromHash();if(i>=0)chooseTopic(i,true,'none')});
  window.addEventListener('popstate',()=>{const i=indexFromHash();chooseTopic(i>=0?i:0,false,'none')});
